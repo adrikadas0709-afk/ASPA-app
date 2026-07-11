@@ -21,11 +21,11 @@ function generateSignal(type, freq, sampleRate, duration, amplitude, dcOffset, n
   for (let i = 0; i < n; i++) {
     const t = i / sampleRate
     let s = 0
-    if (type === 'Sine')         s = amplitude * Math.sin(2 * Math.PI * freq * t)
-    else if (type === 'Square')  s = amplitude * Math.sign(Math.sin(2 * Math.PI * freq * t))
+    if (type === 'Sine') s = amplitude * Math.sin(2 * Math.PI * freq * t)
+    else if (type === 'Square') s = amplitude * Math.sign(Math.sin(2 * Math.PI * freq * t))
     else if (type === 'Sawtooth') s = amplitude * (2 * ((t * freq) % 1) - 1)
     else if (type === 'Triangle') s = amplitude * (2 / Math.PI) * Math.asin(Math.sin(2 * Math.PI * freq * t))
-    else if (type === 'Noise')   s = amplitude * (Math.random() * 2 - 1)
+    else if (type === 'Noise') s = amplitude * (Math.random() * 2 - 1)
     else if (type === 'Chirp') {
       const f = freq + (freq * 4) * (t / duration)
       s = amplitude * Math.sin(2 * Math.PI * f * t)
@@ -72,24 +72,24 @@ function buildWaveform(samples, sampleRate, maxPts = 500) {
 
 function computeMetrics(samples) {
   const rmsVal = rms(samples)
-  const peak   = Math.max(...samples.map(Math.abs))
-  const dc     = samples.reduce((a, s) => a + s, 0) / samples.length
-  const crest  = peak / (rmsVal || 1)
-  const thd    = Math.abs(Math.sin(Math.PI / 4)) * 0.01 * (peak / (rmsVal || 1)) // approximation
+  const peak = Math.max(...samples.map(Math.abs))
+  const dc = samples.reduce((a, s) => a + s, 0) / samples.length
+  const crest = peak / (rmsVal || 1)
+  const thd = Math.abs(Math.sin(Math.PI / 4)) * 0.01 * (peak / (rmsVal || 1)) // approximation
   return {
-    rms:    rmsVal.toFixed(4),
-    rmsDb:  toDB(rmsVal).toFixed(1),
-    peak:   peak.toFixed(4),
+    rms: rmsVal.toFixed(4),
+    rmsDb: toDB(rmsVal).toFixed(1),
+    peak: peak.toFixed(4),
     peakDb: toDB(peak).toFixed(1),
-    dc:     dc.toFixed(5),
-    crest:  crest.toFixed(2),
-    crestDb:(20 * Math.log10(crest)).toFixed(1),
-    thd:    (thd * 100).toFixed(3),
+    dc: dc.toFixed(5),
+    crest: crest.toFixed(2),
+    crestDb: (20 * Math.log10(crest)).toFixed(1),
+    thd: (thd * 100).toFixed(3),
   }
 }
 
-const SIGNAL_TYPES  = ['Sine', 'Square', 'Sawtooth', 'Triangle', 'Noise', 'Chirp']
-const SAMPLE_RATES  = [44100, 48000, 96000]
+const SIGNAL_TYPES = ['Sine', 'Square', 'Sawtooth', 'Triangle', 'Noise', 'Chirp']
+const SAMPLE_RATES = [44100, 48000, 96000]
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
@@ -120,7 +120,7 @@ export default function AudioAnalyzer() {
           <MdGraphicEq size={24} color="var(--accent)" /> Audio Analyzer
         </h1>
         <p className="section-subtitle">Deep file analysis with AI recommendations, or synthesize custom waveforms.</p>
-        
+
         <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
           <button className={mode === 'analyzer' ? 'btn-primary' : 'btn-secondary'} onClick={() => setMode('analyzer')}>File Analyzer</button>
           <button className={mode === 'generator' ? 'btn-primary' : 'btn-secondary'} onClick={() => setMode('generator')}>Signal Generator</button>
@@ -133,15 +133,15 @@ export default function AudioAnalyzer() {
 }
 
 function GeneratorMode() {
-  const [sigType,    setSigType]    = useState('Sine')
-  const [freq,       setFreq]       = useState(1000)
-  const [amplitude,  setAmplitude]  = useState(1.0)
-  const [dcOffset,   setDcOffset]   = useState(0)
+  const [sigType, setSigType] = useState('Sine')
+  const [freq, setFreq] = useState(1000)
+  const [amplitude, setAmplitude] = useState(1.0)
+  const [dcOffset, setDcOffset] = useState(0)
   const [noiseLevel, setNoiseLevel] = useState(0)
   const [sampleRate, setSampleRate] = useState(44100)
-  const [duration,   setDuration]   = useState(0.02)
-  const [running,    setRunning]    = useState(true)
-  const [tab,        setTab]        = useState('waveform')
+  const [duration, setDuration] = useState(0.02)
+  const [running, setRunning] = useState(true)
+  const [tab, setTab] = useState('waveform')
 
   const samples = useMemo(
     () => running ? generateSignal(sigType, freq, sampleRate, duration, amplitude, dcOffset, noiseLevel) : [],
@@ -150,7 +150,7 @@ function GeneratorMode() {
 
   const waveformData = useMemo(() => buildWaveform(samples, sampleRate), [samples, sampleRate])
   const spectrumData = useMemo(() => computeFFT(samples, sampleRate), [samples, sampleRate])
-  const metrics      = useMemo(() => computeMetrics(samples.length ? samples : [0]), [samples])
+  const metrics = useMemo(() => computeMetrics(samples.length ? samples : [0]), [samples])
 
   return (
     <motion.div variants={itemVariants} initial="hidden" animate="visible" style={{ width: '100%' }}>
@@ -220,12 +220,12 @@ function GeneratorMode() {
               <MdMusicNote size={16} color="var(--accent)" /> Signal Metrics
             </div>
             {[
-              { k: 'RMS Level',    v: `${metrics.rms} V`,      sub: `${metrics.rmsDb} dBu` },
-              { k: 'Peak Level',   v: `${metrics.peak} V`,     sub: `${metrics.peakDb} dBu` },
-              { k: 'DC Offset',    v: `${metrics.dc} V`,       sub: dcOffset !== 0 ? '⚠️ Present' : 'OK' },
-              { k: 'Crest Factor', v: `${metrics.crest}×`,     sub: `${metrics.crestDb} dB` },
-              { k: 'Est. THD',     v: `${metrics.thd}%`,       sub: sigType === 'Sine' ? 'Distortion' : 'N/A for non-sine' },
-              { k: 'Sample Rate',  v: `${sampleRate / 1000} kHz`, sub: `Nyquist: ${sampleRate / 2000} kHz` },
+              { k: 'RMS Level', v: `${metrics.rms} V`, sub: `${metrics.rmsDb} dBu` },
+              { k: 'Peak Level', v: `${metrics.peak} V`, sub: `${metrics.peakDb} dBu` },
+              { k: 'DC Offset', v: `${metrics.dc} V`, sub: dcOffset !== 0 ? '⚠️ Present' : 'OK' },
+              { k: 'Crest Factor', v: `${metrics.crest}×`, sub: `${metrics.crestDb} dB` },
+              { k: 'Est. THD', v: `${metrics.thd}%`, sub: sigType === 'Sine' ? 'Distortion' : 'N/A for non-sine' },
+              { k: 'Sample Rate', v: `${sampleRate / 1000} kHz`, sub: `Nyquist: ${sampleRate / 2000} kHz` },
             ].map(m => (
               <div key={m.k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0.35rem 0', borderBottom: '1px solid var(--border)', fontSize: '0.8rem' }}>
                 <div>
@@ -246,7 +246,7 @@ function GeneratorMode() {
             {[
               { id: 'waveform', label: 'Time Domain' },
               { id: 'spectrum', label: 'Frequency Spectrum' },
-              { id: 'levels',   label: 'Level Meter' },
+              { id: 'levels', label: 'Level Meter' },
             ].map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', border: '1px solid', cursor: 'pointer',
@@ -261,7 +261,7 @@ function GeneratorMode() {
           {tab === 'waveform' && (
             <motion.div variants={itemVariants} className="card" style={{ padding: '1rem' }}>
               <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>
-                {sigType} Wave · {freq >= 1000 ? `${(freq/1000).toFixed(2)} kHz` : `${freq} Hz`} · {amplitude.toFixed(2)} Vp
+                {sigType} Wave · {freq >= 1000 ? `${(freq / 1000).toFixed(2)} kHz` : `${freq} Hz`} · {amplitude.toFixed(2)} Vp
               </div>
               <ResponsiveContainer width="100%" height={320}>
                 <AreaChart data={waveformData} margin={{ top: 5, right: 20, left: 0, bottom: 20 }}>
@@ -312,7 +312,7 @@ function GeneratorMode() {
               <LevelMeter rmsDb={parseFloat(metrics.rmsDb)} peakDb={parseFloat(metrics.peakDb)} />
               <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }}>
                 {[
-                  { label: 'RMS',  value: `${metrics.rmsDb} dBu`,  color: 'var(--success)' },
+                  { label: 'RMS', value: `${metrics.rmsDb} dBu`, color: 'var(--success)' },
                   { label: 'Peak', value: `${metrics.peakDb} dBu`, color: parseFloat(metrics.peakDb) > 0 ? 'var(--error)' : 'var(--warning)' },
                   { label: 'Headroom', value: `${(0 - parseFloat(metrics.peakDb)).toFixed(1)} dB`, color: 'var(--accent)' },
                 ].map(m => (
@@ -338,11 +338,11 @@ function GeneratorMode() {
 function LevelMeter({ rmsDb, peakDb }) {
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
   const toPercent = db => clamp((db + 60) / 60 * 100, 0, 100)
-  const rmsPct  = toPercent(rmsDb)
+  const rmsPct = toPercent(rmsDb)
   const peakPct = toPercent(peakDb)
 
   const segments = [
-    { from: 0,  to: 50, color: '#22c55e' },
+    { from: 0, to: 50, color: '#22c55e' },
     { from: 50, to: 75, color: '#f59e0b' },
     { from: 75, to: 90, color: '#f97316' },
     { from: 90, to: 100, color: '#ef4444' },
@@ -475,7 +475,7 @@ function AnalyzerMode() {
 
   return (
     <div className="card" style={{ padding: '4rem', textAlign: 'center', border: '2px dashed var(--border)' }}
-         onDragOver={e => e.preventDefault()} onDrop={handleUpload}>
+      onDragOver={e => e.preventDefault()} onDrop={handleUpload}>
       <MdCloudUpload size={56} color="var(--accent)" style={{ marginBottom: '1rem' }} />
       <h3>Upload Audio File</h3>
       <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Drag & drop WAV, MP3, or AAC file here</p>
@@ -521,51 +521,51 @@ function ResultsDashboard({ file, onReset }) {
       </div>
 
       <div className="card">
-         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-           <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-             <MdMusicNote color="var(--accent)" /> {file.originalName}
-           </h3>
-           <button className="btn-primary" onClick={() => wsRef.current?.playPause()}>
-             {isPlaying ? <><MdPause size={18}/> Pause</> : <><MdPlayArrow size={18}/> Play</>}
-           </button>
-         </div>
-         <div ref={containerRef} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <MdMusicNote color="var(--accent)" /> {file.originalName}
+          </h3>
+          <button className="btn-primary" onClick={() => wsRef.current?.playPause()}>
+            {isPlaying ? <><MdPause size={18} /> Pause</> : <><MdPlayArrow size={18} /> Play</>}
+          </button>
+        </div>
+        <div ref={containerRef} />
       </div>
 
       <div className="aa-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
         <div className="card">
-           <h3 style={{ marginBottom: '1.25rem' }}>Audio Metrics</h3>
-           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <MetricBox label="SNR" value={`${analysis.snrDb} dB`} />
-              <MetricBox label="Noise Floor" value={`${analysis.noiseFloorDb} dBFS`} />
-              <MetricBox label="Dynamic Range" value={`${analysis.dynamicRangeDb} dB`} />
-              <MetricBox label="Clipping" value={analysis.clippingDetected ? `Detected (${analysis.clippingSamples})` : 'None'} color={analysis.clippingDetected ? 'var(--error)' : 'var(--success)'} />
-              <MetricBox label="Peak Level" value={`${analysis.peakDb} dBFS`} />
-              <MetricBox label="RMS Level" value={`${analysis.rmsDb} dBFS`} />
-              <MetricBox label="THD Estimate" value={`${analysis.thdPercent}%`} />
-              <MetricBox label="Spectral Centroid" value={`${analysis.spectralCentroid} Hz`} />
-           </div>
+          <h3 style={{ marginBottom: '1.25rem' }}>Audio Metrics</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <MetricBox label="SNR" value={`${analysis.snrDb} dB`} />
+            <MetricBox label="Noise Floor" value={`${analysis.noiseFloorDb} dBFS`} />
+            <MetricBox label="Dynamic Range" value={`${analysis.dynamicRangeDb} dB`} />
+            <MetricBox label="Clipping" value={analysis.clippingDetected ? `Detected (${analysis.clippingSamples})` : 'None'} color={analysis.clippingDetected ? 'var(--error)' : 'var(--success)'} />
+            <MetricBox label="Peak Level" value={`${analysis.peakDb} dBFS`} />
+            <MetricBox label="RMS Level" value={`${analysis.rmsDb} dBFS`} />
+            <MetricBox label="THD Estimate" value={`${analysis.thdPercent}%`} />
+            <MetricBox label="Spectral Centroid" value={`${analysis.spectralCentroid} Hz`} />
+          </div>
         </div>
 
         <div className="card">
-           <h3 style={{ marginBottom: '1rem' }}>AI Recommendations</h3>
-           <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6, maxHeight: '300px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-             {analysis.aiRecommendations}
-           </div>
+          <h3 style={{ marginBottom: '1rem' }}>AI Recommendations</h3>
+          <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6, maxHeight: '300px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+            {analysis.aiRecommendations}
+          </div>
         </div>
       </div>
 
       <div className="card">
-         <h3 style={{ marginBottom: '1rem' }}>Frequency Spectrum</h3>
-         <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={analysis.spectrumData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="freqHz" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} interval={7} />
-              <YAxis domain={[-80, 5]} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="powerDb" fill="var(--accent)" radius={[2, 2, 0, 0]} name="Power (dB)" />
-            </BarChart>
-         </ResponsiveContainer>
+        <h3 style={{ marginBottom: '1rem' }}>Frequency Spectrum</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={analysis.spectrumData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="freqHz" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} interval={7} />
+            <YAxis domain={[-80, 5]} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar dataKey="powerDb" fill="var(--accent)" radius={[2, 2, 0, 0]} name="Power (dB)" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </motion.div>
   )
@@ -574,8 +574,8 @@ function ResultsDashboard({ file, onReset }) {
 function MetricBox({ label, value, color }) {
   return (
     <div style={{ backgroundColor: 'var(--bg-tertiary)', padding: '0.875rem', borderRadius: '8px', textAlign: 'center' }}>
-       <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>{label}</div>
-       <div style={{ fontSize: '1.05rem', fontWeight: 700, color: color || 'var(--text-primary)', fontFamily: 'monospace' }}>{value}</div>
+      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>{label}</div>
+      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: color || 'var(--text-primary)', fontFamily: 'monospace' }}>{value}</div>
     </div>
   )
 }
