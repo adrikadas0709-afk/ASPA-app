@@ -7,6 +7,8 @@ import {
 import { MdGraphicEq, MdPlayArrow, MdStop, MdMusicNote, MdCloudUpload, MdPause } from 'react-icons/md'
 import WaveSurfer from 'wavesurfer.js'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
 /* ── signal simulation helpers ─────────────────────────────────── */
 function rms(samples) {
   const sum = samples.reduce((a, s) => a + s * s, 0)
@@ -424,7 +426,7 @@ function AnalyzerMode() {
     formData.append('audio', selected)
 
     try {
-      const res = await fetch('http://localhost:5000/api/audio/upload', {
+      const res = await fetch(`${API_URL}/api/audio/upload`, {
         method: 'POST',
         body: formData,
       })
@@ -442,7 +444,7 @@ function AnalyzerMode() {
     if (analysisId && !result) {
       interval = setInterval(async () => {
         try {
-          const res = await fetch(`http://localhost:5000/api/audio/${analysisId}`)
+          const res = await fetch(`${API_URL}/api/audio/${analysisId}`)
           const data = await res.json()
           if (data.success) {
             const status = data.audioFile.analysis.status
@@ -494,7 +496,7 @@ function ResultsDashboard({ file, onReset }) {
   const containerRef = useRef(null)
   const wsRef = useRef(null)
 
-  const audioUrl = `http://localhost:5000/uploads/${file.storedName}`
+  const audioUrl = `${API_URL}/uploads/${file.storedName}`
 
   useEffect(() => {
     if (!containerRef.current) return

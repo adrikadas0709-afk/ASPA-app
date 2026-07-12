@@ -63,7 +63,8 @@ export function ChatProvider({ children }) {
       conversationHistory.push({ role: 'user', content: userText })
 
       // Call the ASPA backend API, which securely handles Watsonx communication
-      const response = await fetch('http://localhost:5000/api/ai/chat', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${API_URL}/api/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: conversationHistory }),
